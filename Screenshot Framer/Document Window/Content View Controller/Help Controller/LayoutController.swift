@@ -85,6 +85,24 @@ class LayoutController {
 
 // MARK: - Private
 
+private class VerticallyCenteredTextFieldCell: NSTextFieldCell {
+    override func titleRect(forBounds rect: NSRect) -> NSRect {
+        var titleRect = super.titleRect(forBounds: rect)
+        let minimumHeight = self.cellSize(forBounds: rect).height
+        titleRect.origin.y += (titleRect.height - minimumHeight) / 2
+        titleRect.size.height = minimumHeight
+        return titleRect
+    }
+
+    override func drawInterior(withFrame cellFrame: NSRect, in controlView: NSView) {
+        super.drawInterior(withFrame: titleRect(forBounds: cellFrame), in: controlView)
+    }
+
+    override func draw(withFrame cellFrame: NSRect, in controlView: NSView) {
+        super.draw(withFrame: cellFrame, in: controlView)
+    }
+}
+
 private extension LayoutController {
 
     func textField(from object: LayoutableObject) -> NSTextField {
@@ -93,17 +111,18 @@ private extension LayoutController {
         let text = self.fileController.localizedTitle(from: absoluteURL, viewState: viewState)
 
         let textField = NSTextField(frame: object.frame)
-        textField.textColor = NSColor.white
-        textField.backgroundColor = NSColor.clear
-        textField.isBezeled = false
-        textField.isEditable = false
-        textField.alignment = .center
-
         if let text = text {
+            textField.cell = VerticallyCenteredTextFieldCell()
             textField.stringValue = text
+            textField.backgroundColor = NSColor.clear
         } else {
             textField.backgroundColor = NSColor.red
         }
+        
+        textField.textColor = NSColor.white
+        textField.isBezeled = false
+        textField.isEditable = false
+        textField.alignment = .center
 
         textField.font = self.font(for: object)
 
